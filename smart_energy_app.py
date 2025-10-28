@@ -864,28 +864,56 @@ def main():
         </div>
         ''', unsafe_allow_html=True)
     
-    # Main content tabs
-    tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
-        "🏠 Dashboard", "💡 Energy Tips", "📋 Action Log", "⚠️ Alerts", "📊 Analytics", "🤖 ML Model"
+    # Top nav ribbon
+    st.markdown(
+        '''
+        <div style="display:flex; gap: .5rem; align-items:center; justify-content:center; margin: 0 0 1rem 0;">
+            <span style="background:#0F172A; border:2px solid #4ECDC4; color:#4ECDC4; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">FAST</span>
+            <span style="background:#0F172A; border:2px solid #FFE66D; color:#FFE66D; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">MODERN</span>
+            <span style="background:#0F172A; border:2px solid #FF6B6B; color:#FF6B6B; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">INTUITIVE</span>
+        </div>
+        ''',
+        unsafe_allow_html=True,
+    )
+
+    # Main content tabs (refreshed order and labels)
+    tab_dashboard, tab_analytics, tab_alerts, tab_tips, tab_controls, tab_ai = st.tabs([
+        "🏠 Overview", "📊 Analytics", "⚠️ Alerts", "💡 Energy Tips", "🛠️ Controls & Actions", "🤖 AI Lab"
     ])
     
-    with tab1:
+    with tab_dashboard:
         show_dashboard()
     
-    with tab2:
-        show_energy_tips()
-    
-    with tab3:
-        show_action_log()
-    
-    with tab4:
-        show_alerts()
-    
-    with tab5:
+    with tab_analytics:
         show_analytics()
     
-    with tab6:
+    with tab_alerts:
+        show_alerts()
+    
+    with tab_tips:
+        show_energy_tips()
+    
+    with tab_controls:
+        show_action_log()
+    
+    with tab_ai:
         show_ml_model_interface()
+
+    # Footer / status bar
+    st.markdown(
+        '''
+        <div style="margin-top:2rem; border-top: 4px solid #0F172A;">
+          <div style="display:flex; flex-wrap:wrap; gap:.75rem; align-items:center; justify-content:space-between; padding: 1rem 0;">
+            <div style="color:#94a3b8; font-weight:700; letter-spacing:.02em;">⚡ Smart Energy • UI v2</div>
+            <div style="display:flex; gap:.5rem; align-items:center;">
+              <span style="background:#2E3440; border:2px solid #0F172A; color:#E5E7EB; padding:.35rem .6rem; border-radius:10px; font-weight:700; font-size:.8rem;">Streamlit</span>
+              <span style="background:#2E3440; border:2px solid #0F172A; color:#E5E7EB; padding:.35rem .6rem; border-radius:10px; font-weight:700; font-size:.8rem;">Realtime Simulation</span>
+            </div>
+          </div>
+        </div>
+        ''',
+        unsafe_allow_html=True,
+    )
 
 def show_dashboard():
     """Display main dashboard"""
