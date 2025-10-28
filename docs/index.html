@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Smart Energy App</title>
+  <style>
+    body { margin:0; font-family: system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica Neue, Arial, "Apple Color Emoji", "Segoe UI Emoji"; background:#0f172a; color:#e5e7eb; display:flex; align-items:center; justify-content:center; min-height:100vh; }
+    .card { background: linear-gradient(135deg,#111827,#1f2937); border:1px solid #374151; border-radius:16px; padding:32px; max-width:720px; width:92%; box-shadow:0 10px 30px rgba(0,0,0,.4); }
+    h1 { margin:0 0 8px; font-size:28px; background: linear-gradient(135deg,#f59e0b,#10b981,#60a5fa); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    p { margin:0 0 20px; color:#cbd5e1; line-height:1.55; }
+    a.btn { display:inline-block; background:#22c55e; color:#0b1220; font-weight:700; text-decoration:none; padding:12px 18px; border-radius:12px; border:2px solid #052e1b; box-shadow:0 6px 0 #052e1b; transition: transform .15s ease; }
+    a.btn:hover { transform: translateY(-2px); }
+    .muted { color:#94a3b8; font-size:14px; margin-top:12px; }
+    code { background:#0b1220; padding:2px 6px; border-radius:6px; border:1px solid #1f2937; }
+  </style>
+  <script>
+    // Replace this with your deployed Streamlit URL after deployment
+    const STREAMLIT_URL = ""; // e.g. "https://smartenergy-yourname.streamlit.app"
+    function go() {
+      if (STREAMLIT_URL) { window.location.href = STREAMLIT_URL; }
+      else { document.getElementById('link').style.display = 'inline-block'; }
+    }
+    window.addEventListener('DOMContentLoaded', go);
+  </script>
+  <meta http-equiv="refresh" content="0; url=" />
+  <noscript>
+    <meta http-equiv="refresh" content="0; url=#" />
+  </noscript>
+  </head>
+<body>
+  <div class="card">
+    <h1>⚡ Smart Energy Efficiency Framework</h1>
+    <p>This project runs as a Streamlit web app and can’t be served directly by GitHub Pages. Click the button below to open the live application.</p>
+    <a id="link" class="btn" href="#" target="_blank" rel="noopener">Open Streamlit App</a>
+    <p class="muted">After you deploy on Streamlit Cloud, edit <code>docs/index.html</code> and set <code>STREAMLIT_URL</code> to your app URL, then commit and push.</p>
+  </div>
+</body>
+</html>
+
