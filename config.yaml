@@ -1,0 +1,4 @@
+
+gpio_pin: 17
+off_delay: 15
+temp_threshold: 27
