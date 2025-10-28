@@ -864,39 +864,41 @@ def main():
         </div>
         ''', unsafe_allow_html=True)
     
-    # Top nav ribbon
-    st.markdown(
-        '''
-        <div style="display:flex; gap: .5rem; align-items:center; justify-content:center; margin: 0 0 1rem 0;">
-            <span style="background:#0F172A; border:2px solid #4ECDC4; color:#4ECDC4; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">FAST</span>
-            <span style="background:#0F172A; border:2px solid #FFE66D; color:#FFE66D; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">MODERN</span>
-            <span style="background:#0F172A; border:2px solid #FF6B6B; color:#FF6B6B; padding:.4rem .8rem; border-radius:999px; font-weight:800; font-size:.85rem; letter-spacing:.04em;">INTUITIVE</span>
-        </div>
-        ''',
-        unsafe_allow_html=True,
-    )
+    # Left navigation (Firebase Studio-like)
+    with st.sidebar:
+        st.markdown("### 🧭 Navigation")
+        nav_choice = st.radio(
+            "Go to",
+            options=[
+                "🏠 Overview",
+                "📟 Devices",
+                "📊 Analytics",
+                "🧾 Events",
+                "⚙️ Automations",
+                "💡 Energy Tips",
+                "🔧 Settings",
+                "🤖 AI Lab",
+            ],
+            index=0,
+            key="left_nav_choice",
+        )
 
-    # Main content tabs (refreshed order and labels)
-    tab_dashboard, tab_analytics, tab_alerts, tab_tips, tab_controls, tab_ai = st.tabs([
-        "🏠 Overview", "📊 Analytics", "⚠️ Alerts", "💡 Energy Tips", "🛠️ Controls & Actions", "🤖 AI Lab"
-    ])
-    
-    with tab_dashboard:
+    # Route to selected page
+    if nav_choice == "🏠 Overview":
         show_dashboard()
-    
-    with tab_analytics:
+    elif nav_choice == "📟 Devices":
+        show_devices()
+    elif nav_choice == "📊 Analytics":
         show_analytics()
-    
-    with tab_alerts:
-        show_alerts()
-    
-    with tab_tips:
+    elif nav_choice == "🧾 Events":
+        show_events()
+    elif nav_choice == "⚙️ Automations":
+        show_automations()
+    elif nav_choice == "💡 Energy Tips":
         show_energy_tips()
-    
-    with tab_controls:
-        show_action_log()
-    
-    with tab_ai:
+    elif nav_choice == "🔧 Settings":
+        show_settings()
+    elif nav_choice == "🤖 AI Lab":
         show_ml_model_interface()
 
     # Footer / status bar
@@ -914,6 +916,86 @@ def main():
         ''',
         unsafe_allow_html=True,
     )
+
+def show_devices():
+    """Devices page listing rooms and appliances with quick controls"""
+    st.header("📟 Devices")
+    for room_id, room in st.session_state.energy_monitor.rooms.items():
+        with st.expander(f"{room.name} — {room.get_appliance_count()} on", expanded=False):
+            cols = st.columns(3)
+            with cols[0]:
+                st.write(f"Occupancy: {'🟢' if room.is_occupied else '🔴'}")
+            with cols[1]:
+                st.write(f"People: {room.person_count}")
+            with cols[2]:
+                st.write(f"Confidence: {room.occupancy_confidence:.0%}")
+
+            grid_cols = st.columns(4)
+            i = 0
+            for appliance, status in room.appliances.items():
+                with grid_cols[i % 4]:
+                    toggled = st.toggle(f"{appliance}", value=status, key=f"dev_{room_id}_{appliance}")
+                    if toggled != status:
+                        room.appliances[appliance] = toggled
+                        log_action("Device Toggle", room.name, appliance, toggled)
+                i += 1
+
+def show_events():
+    """Events page based on action_log"""
+    st.header("🧾 Events")
+    if not st.session_state.action_log:
+        st.info("No events yet. Interact with devices to generate events.")
+        return
+    for action in st.session_state.action_log[:50]:
+        status_icon = "✅" if action['status'] else "❌"
+        st.write(f"{action['timestamp'].strftime('%Y-%m-%d %H:%M:%S')} • {action['type']} • {action['room']} • {action['appliance']} • {status_icon}")
+
+def show_automations():
+    """Automations page: simple rules for occupancy/temperature"""
+    st.header("⚙️ Automations")
+    if 'automation_rules' not in st.session_state:
+        st.session_state.automation_rules = {
+            'turn_off_when_empty': True,
+            'target_temp_threshold': st.session_state.temperature_threshold,
+        }
+
+    st.subheader("Rules")
+    st.session_state.automation_rules['turn_off_when_empty'] = st.checkbox(
+        "Turn off all appliances in empty rooms",
+        value=st.session_state.automation_rules['turn_off_when_empty'],
+    )
+    st.session_state.automation_rules['target_temp_threshold'] = st.slider(
+        "Comfort temperature threshold (°C)", 20.0, 35.0,
+        value=float(st.session_state.automation_rules['target_temp_threshold']), step=0.5,
+    )
+
+    if st.button("Apply Automations Now"):
+        apply_automations()
+        st.success("Automations applied")
+
+    st.caption("Automations run when you click the button. You can schedule this in production.")
+
+def apply_automations():
+    """Apply simple automation rules to rooms"""
+    rules = st.session_state.automation_rules
+    for room in st.session_state.energy_monitor.rooms.values():
+        if rules.get('turn_off_when_empty') and not room.is_occupied:
+            for appliance in list(room.appliances.keys()):
+                if room.appliances[appliance]:
+                    room.appliances[appliance] = False
+                    log_action("Automation", room.name, appliance, False)
+
+def show_settings():
+    """Settings page for thresholds and theme"""
+    st.header("🔧 Settings")
+    st.subheader("Temperature")
+    st.session_state.temperature_threshold = st.slider(
+        "Global temperature threshold (°C)", 20.0, 35.0,
+        value=float(st.session_state.temperature_threshold), step=0.5,
+    )
+    st.subheader("Theme")
+    dark_mode = st.toggle("Dark mode (UI preset)", value=True, disabled=True)
+    st.caption("Dark mode is enabled by default in this UI.")
 
 def show_dashboard():
     """Display main dashboard"""
